@@ -329,18 +329,21 @@ function doSearch() {
   renderResults(results, keyword);
 }
 
-let searchTimer = null;
-
 function setupEvents() {
   const input = $("searchInput");
+  const searchBtn = $("searchBtn");
   const clearBtn = $("clearBtn");
   const caseBox = $("caseSensitive");
 
-  input.addEventListener("input", () => {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(doSearch, 180);
-  });
+  // 搜索按钮点击事件
+  if (searchBtn) {
+    searchBtn.addEventListener("click", () => {
+      doSearch();
+      input.focus();
+    });
+  }
 
+  // 移除实时搜索，只在用户按 Enter 或点击搜索按钮时搜索，减轻页面压力
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       doSearch();

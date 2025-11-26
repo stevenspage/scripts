@@ -211,6 +211,23 @@ body {
   color: #6b7280;
 }
 
+#searchBtn {
+  border: none;
+  background: #1f2937;
+  color: #e5e7eb;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  margin-right: 4px;
+}
+
+#searchBtn:hover {
+  background-color: #374151;
+  color: #ffffff;
+}
+
 #clearBtn {
   border: none;
   background: none;
