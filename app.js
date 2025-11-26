@@ -120,13 +120,9 @@ async function loadAllSubtitles() {
   const perFileCount = {};
   for (const file of files) {
     try {
-      // 为避免浏览器缓存旧的字幕内容，这里给请求加上时间戳参数并禁用缓存
-      const url =
-        SUBTITLE_PATH_PREFIX +
-        file +
-        "?v=" +
-        Date.now().toString();
-      const res = await fetch(url, { cache: "no-store" });
+      // 统一按固定 URL 加载，允许浏览器缓存，以便首页或浏览器预拉时可以复用缓存
+      const url = SUBTITLE_PATH_PREFIX + file;
+      const res = await fetch(url);
       if (!res.ok) throw new Error(res.statusText || "HTTP " + res.status);
       const text = await res.text();
       const lower = file.toLowerCase();

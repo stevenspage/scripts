@@ -48,6 +48,20 @@
     <span>《纸牌屋》字幕 · 纯前端搜索 · GitHub Pages 在线托管</span>
   </footer>
 
+  <!-- 隐式预加载字幕文件，利用浏览器缓存加速后续搜索页加载 -->
+  <script src="subtitles/list.js"></script>
+  <script>
+    (function preloadSubtitles() {
+      if (!window.SUBTITLE_FILES || !window.SUBTITLE_FILES.length) return;
+      var prefix = "subtitles/";
+      window.SUBTITLE_FILES.forEach(function (file) {
+        var url = prefix + file;
+        // 只为填充缓存，不关心结果，失败也静默忽略
+        fetch(url).catch(function () {});
+      });
+    })();
+  </script>
+
   <script>
     (function () {
       const form = document.getElementById("homeSearchForm");
