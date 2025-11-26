@@ -2,6 +2,8 @@
 
 这是一个纯前端的《纸牌屋 (House of Cards)》字幕全文搜索小站点，支持在浏览器中对六季字幕进行英文台词全文检索，无需后端服务。
 
+地址：https://stevenspage.github.io/scripts/
+
 ---
 
 ## 功能特性
