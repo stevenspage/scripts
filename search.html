@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>字幕全文搜索 - 搜索结果</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top-bar">
+    <div class="title">《纸牌屋》字幕全文搜索</div>
+    <div class="search-area">
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="输入要搜索的英文单词 / 短语，例如：word travels fast in this town"
+        autocomplete="off"
+      />
+      <button id="clearBtn" title="清空搜索">✕</button>
+    </div>
+    <div class="options">
+      <label class="option">
+        <input id="caseSensitive" type="checkbox">
+        大小写敏感
+      </label>
+    </div>
+    <div id="status" class="status-text">正在加载字幕文件…</div>
+  </header>
+
+  <main class="layout">
+    <section class="panel panel-left">
+      <div class="panel-header">匹配结果</div>
+      <div id="results" class="results-list">
+        <!-- 搜索结果列表 -->
+      </div>
+    </section>
+
+    <section class="panel panel-right">
+      <div class="panel-header" id="detailPanelHeader">字幕上下文</div>
+      <div id="detail" class="detail-view">
+        <div class="placeholder">
+          在上方输入关键词，左侧会列出所有匹配句子，点击即可在这里查看所在片段的上下文。
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 字幕文件列表（请编辑 subtitles/list.js 来配置所有字幕文件名） -->
+  <script src="subtitles/list.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
+

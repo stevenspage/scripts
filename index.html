@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>字幕全文搜索 - 首页</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="home-page">
+  <main class="home-main">
+    <div class="home-card">
+      <div class="home-logo">House of Cards</div>
+      <div class="home-subtitle">全六季在线字幕全文搜索</div>
+
+      <div class="home-hero">
+        <img
+          src="images/hoc-poster.jpg"
+          alt="House of Cards 剧照"
+        />
+      </div>
+
+      <div class="home-tags">
+        <span class="home-tag">支持整句精准搜索</span>
+        <span class="home-tag">英文原文 + 通配符搜索</span>
+        <span class="home-tag">纯前端 · GitHub Pages 托管</span>
+      </div>
+
+      <form id="homeSearchForm" class="home-search">
+        <input
+          id="homeSearchInput"
+          type="text"
+          placeholder="像 Google 一样，在这里输入要搜索的英文句子或单词"
+          autocomplete="off"
+        />
+        <div class="home-buttons">
+          <button type="submit">搜索字幕</button>
+        </div>
+      </form>
+
+      <div class="home-hint">
+        支持使用 <code>*</code> 通配符，例如：<code>peach*</code>、<code>*bill</code>、<code>edu*bill</code>。
+      </div>
+    </div>
+  </main>
+
+  <footer class="home-footer">
+    <span>《纸牌屋》字幕 · 纯前端搜索 · GitHub Pages 在线托管</span>
+  </footer>
+
+  <script>
+    (function () {
+      const form = document.getElementById("homeSearchForm");
+      const input = document.getElementById("homeSearchInput");
+      if (!form || !input) return;
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const q = (input.value || "").trim();
+        if (!q) {
+          input.focus();
+          return;
+        }
+        const url = "search.html?q=" + encodeURIComponent(q);
+        window.location.href = url;
+      });
+
+      input.focus();
+    })();
+  </script>
+</body>
+</html>
