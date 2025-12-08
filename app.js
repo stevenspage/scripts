@@ -9,9 +9,23 @@ let currentHighlightRegex = null; // 当前用于高亮的正则（支持 * 通�
 
 const $ = (id) => document.getElementById(id);
 
-function setStatus(text) {
+function setStatus(text, isLoading = false) {
   const el = $("status");
-  if (el) el.textContent = text;
+  if (!el) return;
+  
+  if (isLoading) {
+    el.classList.add("loading");
+    const messageEl = el.querySelector(".status-message");
+    if (messageEl) {
+      messageEl.textContent = text;
+    }
+  } else {
+    el.classList.remove("loading");
+    const contentEl = el.querySelector(".status-content");
+    if (contentEl) {
+      contentEl.textContent = text;
+    }
+  }
 }
 
 function escapeRegExp(str) {
@@ -110,11 +124,11 @@ function parseLrc(content, fileName) {
 async function loadAllSubtitles() {
   const files = (window.SUBTITLE_FILES || []).filter(Boolean);
   if (!files.length) {
-    setStatus("请先编辑 subtitles/list.js，配置所有要搜索的 .srt 文件。");
+    setStatus("请先编辑 subtitles/list.js，配置所有要搜索的 .srt 文件。", false);
     return [];
   }
 
-  setStatus(`正在加载字幕文件（共 ${files.length} 个）…`);
+  setStatus(`正在加载字幕文件（共 ${files.length} 个）`, true);
 
   const all = [];
   const perFileCount = {};
@@ -136,7 +150,7 @@ async function loadAllSubtitles() {
       perFileCount[file] = (segs && segs.length) || 0;
     } catch (err) {
       console.error("加载字幕失败:", file, err);
-      setStatus(`加载 ${file} 失败：${err.message}`);
+      setStatus(`加载 ${file} 失败：${err.message}`, false);
     }
   }
 
@@ -145,7 +159,8 @@ async function loadAllSubtitles() {
     .map(([name, count]) => `${name}: ${count}`)
     .join(" | ");
   setStatus(
-    `已加载 ${all.length} 条字幕台词，可开始搜索。（按 F12 打开控制台可查看各文件行数）`
+    `已加载 ${all.length} 条字幕台词，可开始搜索。（按 F12 打开控制台可查看各文件行数）`,
+    false
   );
   console.log("各文件已解析的字幕行数：", fileSummary);
   return all;
@@ -300,27 +315,12 @@ function showContext(index, keyword, caseSensitive) {
   }
 }
 
-function showLoading() {
-  const loadingIndicator = $("loadingIndicator");
-  if (loadingIndicator) {
-    loadingIndicator.style.display = "flex";
-  }
-}
-
-function hideLoading() {
-  const loadingIndicator = $("loadingIndicator");
-  if (loadingIndicator) {
-    loadingIndicator.style.display = "none";
-  }
-}
-
 function doSearch() {
   const keyword = $("searchInput").value.trim();
   const caseSensitive = $("caseSensitive").checked;
 
   if (!allSegments.length) {
     setStatus("字幕尚未加载完成，请稍候。");
-    hideLoading();
     return;
   }
 
@@ -328,30 +328,20 @@ function doSearch() {
     currentHighlightRegex = null;
     renderResults([], "");
     setStatus(`已加载 ${allSegments.length} 条字幕台词。`);
-    hideLoading();
     return;
   }
 
-  // 显示加载动画
-  showLoading();
+  // 构建支持 * 通配符的正则
+  const testRe = buildSearchRegex(keyword, caseSensitive, false);
+  const highlightRe = buildSearchRegex(keyword, caseSensitive, true);
+  currentHighlightRegex = highlightRe;
 
-  // 使用 setTimeout 让UI有机会先更新显示加载动画
-  setTimeout(() => {
-    // 构建支持 * 通配符的正则
-    const testRe = buildSearchRegex(keyword, caseSensitive, false);
-    const highlightRe = buildSearchRegex(keyword, caseSensitive, true);
-    currentHighlightRegex = highlightRe;
+  const results = allSegments.filter((seg) => {
+    return testRe ? testRe.test(seg.text) : false;
+  });
 
-    const results = allSegments.filter((seg) => {
-      return testRe ? testRe.test(seg.text) : false;
-    });
-
-    // 隐藏加载动画
-    hideLoading();
-
-    setStatus(`找到 ${results.length} 条匹配结果。`);
-    renderResults(results, keyword);
-  }, 10);
+  setStatus(`找到 ${results.length} 条匹配结果。`);
+  renderResults(results, keyword);
 }
 
 // 更新清空按钮的显示状态

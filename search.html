@@ -26,7 +26,18 @@
         大小写敏感
       </label>
     </div>
-    <div id="status" class="status-text">正在加载字幕文件…</div>
+    <div id="status" class="status-text">
+      <span class="status-loading">
+        <span class="spinner"></span>
+        <span class="status-message">正在加载字幕文件</span>
+        <span class="loading-dots">
+          <span class="dot">.</span>
+          <span class="dot">.</span>
+          <span class="dot">.</span>
+        </span>
+      </span>
+      <span class="status-content"></span>
+    </div>
   </header>
 
   <main class="layout">
@@ -34,10 +45,6 @@
       <div class="panel-header">匹配结果</div>
       <div id="results" class="results-list">
         <!-- 搜索结果列表 -->
-      </div>
-      <div id="loadingIndicator" class="loading-indicator" style="display: none;">
-        <div class="spinner"></div>
-        <div class="loading-text">正在搜索…</div>
       </div>
     </section>
 
