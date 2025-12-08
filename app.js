@@ -300,12 +300,27 @@ function showContext(index, keyword, caseSensitive) {
   }
 }
 
+function showLoading() {
+  const loadingIndicator = $("loadingIndicator");
+  if (loadingIndicator) {
+    loadingIndicator.style.display = "flex";
+  }
+}
+
+function hideLoading() {
+  const loadingIndicator = $("loadingIndicator");
+  if (loadingIndicator) {
+    loadingIndicator.style.display = "none";
+  }
+}
+
 function doSearch() {
   const keyword = $("searchInput").value.trim();
   const caseSensitive = $("caseSensitive").checked;
 
   if (!allSegments.length) {
     setStatus("字幕尚未加载完成，请稍候。");
+    hideLoading();
     return;
   }
 
@@ -313,20 +328,43 @@ function doSearch() {
     currentHighlightRegex = null;
     renderResults([], "");
     setStatus(`已加载 ${allSegments.length} 条字幕台词。`);
+    hideLoading();
     return;
   }
 
-  // 构建支持 * 通配符的正则
-  const testRe = buildSearchRegex(keyword, caseSensitive, false);
-  const highlightRe = buildSearchRegex(keyword, caseSensitive, true);
-  currentHighlightRegex = highlightRe;
+  // 显示加载动画
+  showLoading();
 
-  const results = allSegments.filter((seg) => {
-    return testRe ? testRe.test(seg.text) : false;
-  });
+  // 使用 setTimeout 让UI有机会先更新显示加载动画
+  setTimeout(() => {
+    // 构建支持 * 通配符的正则
+    const testRe = buildSearchRegex(keyword, caseSensitive, false);
+    const highlightRe = buildSearchRegex(keyword, caseSensitive, true);
+    currentHighlightRegex = highlightRe;
 
-  setStatus(`找到 ${results.length} 条匹配结果。`);
-  renderResults(results, keyword);
+    const results = allSegments.filter((seg) => {
+      return testRe ? testRe.test(seg.text) : false;
+    });
+
+    // 隐藏加载动画
+    hideLoading();
+
+    setStatus(`找到 ${results.length} 条匹配结果。`);
+    renderResults(results, keyword);
+  }, 10);
+}
+
+// 更新清空按钮的显示状态
+function updateClearButtonVisibility() {
+  const input = $("searchInput");
+  const clearBtn = $("clearBtn");
+  if (!input || !clearBtn) return;
+  
+  if (input.value.trim()) {
+    clearBtn.classList.add("visible");
+  } else {
+    clearBtn.classList.remove("visible");
+  }
 }
 
 function setupEvents() {
@@ -368,9 +406,15 @@ function setupEvents() {
     }
   });
 
+  // 监听输入框内容变化，动态显示/隐藏清空按钮
+  input.addEventListener("input", () => {
+    updateClearButtonVisibility();
+  });
+
   clearBtn.addEventListener("click", () => {
     input.value = "";
     input.focus();
+    updateClearButtonVisibility();
     doSearch();
   });
 
@@ -395,8 +439,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (caseBox && initialCs === "1") {
       caseBox.checked = true;
     }
+    updateClearButtonVisibility();
     doSearch();
     if (input) input.focus();
+  } else {
+    // 初始化时也要更新清空按钮状态
+    updateClearButtonVisibility();
   }
 });
 

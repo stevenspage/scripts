@@ -17,8 +17,8 @@
         placeholder="输入要搜索的英文单词 / 短语，例如：word travels fast in this town"
         autocomplete="off"
       />
-      <button id="searchBtn" title="搜索">搜索</button>
       <button id="clearBtn" title="清空搜索">✕</button>
+      <button id="searchBtn" title="搜索">搜索</button>
     </div>
     <div class="options">
       <label class="option">
@@ -34,6 +34,10 @@
       <div class="panel-header">匹配结果</div>
       <div id="results" class="results-list">
         <!-- 搜索结果列表 -->
+      </div>
+      <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+        <div class="spinner"></div>
+        <div class="loading-text">正在搜索…</div>
       </div>
     </section>
 
