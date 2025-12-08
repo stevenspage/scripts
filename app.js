@@ -48,83 +48,13 @@ function buildSearchRegex(keyword, caseSensitive, forHighlight) {
   return new RegExp(pattern, flags + extra);
 }
 
-function parseSrt(content, fileName) {
-  const blocks = content
-    .replace(/\r\n/g, "\n")
-    .split(/\n{2,}/)
-    .map((b) => b.trim())
-    .filter(Boolean);
-
-  const segments = [];
-
-  for (const block of blocks) {
-    const lines = block.split("\n");
-    if (lines.length < 2) continue;
-
-    // 第一行通常是编号，第二行是时间轴
-    const maybeIndex = lines[0].trim();
-    const timeLine = lines[1].trim();
-    const textLines = lines.slice(2);
-
-    const timeMatch =
-      timeLine &&
-      timeLine.match(
-        /(\d{2}:\d{2}:\d{2},\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2},\d{3})/
-      );
-    const startTime = timeMatch ? timeMatch[1] : "";
-    const endTime = timeMatch ? timeMatch[2] : "";
-
-    const text = textLines.join(" ").replace(/<[^>]+>/g, "").trim();
-    if (!text) continue;
-
-    segments.push({
-      file: fileName,
-      index: Number.isFinite(+maybeIndex) ? parseInt(maybeIndex, 10) : null,
-      startTime,
-      endTime,
-      text,
-    });
-  }
-
-  return segments;
-}
-
-function parseLrc(content, fileName) {
-  const lines = content.replace(/\r\n/g, "\n").split("\n");
-  const segments = [];
-
-  const timeRe = /\[(\d{2}):(\d{2}\.\d{2})]/; // [mm:ss.xx]
-
-  let idx = 1;
-  for (const raw of lines) {
-    const line = raw.trim();
-    if (!line) continue;
-    const m = line.match(timeRe);
-    if (!m) continue;
-    const [, mm, ssxx] = m;
-    const text = line.replace(timeRe, "").trim();
-    if (!text) continue;
-
-    // 转成类似 00:mm:ss,ms 的格式，方便显示
-    const [ss, xx] = ssxx.split(".");
-    const startTime = `00:${mm}:${ss},${xx.padEnd(3, "0")}`;
-
-    segments.push({
-      file: fileName,
-      index: idx++,
-      startTime,
-      endTime: "",
-      text,
-    });
-  }
-
-  return segments;
-}
+// 解析函数已移除，现在直接使用 JSON 格式的字幕文件
+// 使用 convert-subtitles.js 脚本将 .lrc/.srt 文件转换为 .json 格式
 
 async function loadAllSubtitles() {
   const files = (window.SUBTITLE_FILES || []).filter(Boolean);
   if (!files.length) {
-    setStatus("请先编辑 subtitles/list.js，配置所有要搜索的 .srt 文件。", false);
+    setStatus("请先编辑 subtitles/list.js，配置所有要搜索的 .json 文件。", false);
     return [];
   }
 
@@ -134,18 +64,13 @@ async function loadAllSubtitles() {
   const perFileCount = {};
   for (const file of files) {
     try {
-      // 统一按固定 URL 加载，允许浏览器缓存，以便首页或浏览器预拉时可以复用缓存
+      // 直接加载 JSON 文件（文件扩展名应为 .json）
       const url = SUBTITLE_PATH_PREFIX + file;
       const res = await fetch(url);
       if (!res.ok) throw new Error(res.statusText || "HTTP " + res.status);
-      const text = await res.text();
-      const lower = file.toLowerCase();
-      let segs;
-      if (lower.endsWith(".lrc")) {
-        segs = parseLrc(text, file);
-      } else {
-        segs = parseSrt(text, file);
-      }
+      
+      // 直接解析 JSON，无需文本解析，性能更快
+      const segs = await res.json();
       all.push(...segs);
       perFileCount[file] = (segs && segs.length) || 0;
     } catch (err) {
