@@ -284,7 +284,16 @@ body {
 .status-loading {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  padding: 4px 10px;
+  background: rgba(59, 130, 246, 0.12);
+  border-radius: 6px;
+}
+
+.status-message {
+  font-size: 14px;
+  font-weight: 600;
+  color: #22d3ee;
 }
 
 .status-content {
